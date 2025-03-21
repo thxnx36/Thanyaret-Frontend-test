@@ -319,7 +319,7 @@ export default function Home() {
           </div>
           
           <motion.a 
-            href="https://github.com/yourusername" 
+            href="https://github.com/thxnx36/Thanyaret-Frontend-test" 
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}

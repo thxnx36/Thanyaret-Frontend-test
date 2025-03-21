@@ -149,7 +149,6 @@ src/
 
 - [ ] เพิ่มระบบ authentication
 - [ ] เพิ่มการทดสอบด้วย Jest และ React Testing Library
-- [ ] เพิ่มการ deploy ขึ้น Vercel หรือ Netlify
 - [ ] เพิ่มฟีเจอร์ Dark mode
 - [ ] ปรับปรุงประสิทธิภาพการทำงานกับข้อมูลจำนวนมาก
 
