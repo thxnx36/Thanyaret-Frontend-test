@@ -1,7 +1,7 @@
 import { User } from '@/types';
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEnvelope, FaBuilding, FaBriefcase, FaInfoCircle, FaPhone, FaMapMarkerAlt, FaBirthdayCake } from 'react-icons/fa';
+import { FaEnvelope, FaBuilding, FaBriefcase, FaInfoCircle, FaPhone, FaMapMarkerAlt, FaBirthdayCake, FaMale, FaFemale } from 'react-icons/fa';
 
 interface UserCardProps {
   user: User;
@@ -9,6 +9,43 @@ interface UserCardProps {
 
 const UserCard: FC<UserCardProps> = ({ user }) => {
   const [showDetail, setShowDetail] = useState(false);
+  
+  // คำนวณเพศจากข้อมูลที่มี (อาจเป็นข้อมูลจาก API หรือเดาจากชื่อ)
+  const gender = useMemo(() => {
+    if (user['gender'] === 'male') return 'male';
+    if (user['gender'] === 'female') return 'female';
+    
+    // เดาเพศจากชื่อ (แบบง่ายๆ)
+    if (user.firstName.endsWith('a') || 
+        user.firstName.endsWith('e') || 
+        user.firstName.endsWith('i') ||
+        user.firstName.endsWith('y')) {
+      return 'female';
+    }
+    return 'male';
+  }, [user]);
+
+  // คำนวณอายุจากวันเกิด
+  const age = useMemo(() => {
+    if (!user.birthDate) return null;
+    
+    const birthDate = new Date(user.birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    
+    // ปรับอายุหากยังไม่ถึงวันเกิดในปีนี้
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age > 0 && age < 100 ? age : null;
+  }, [user.birthDate]);
+
+  // แสดงไอคอนตามเพศ
+  const GenderIcon = gender === 'female' ? FaFemale : FaMale;
+  const genderColor = gender === 'female' ? 'text-pink-500' : 'text-blue-500';
+  const genderText = gender === 'female' ? 'หญิง' : 'ชาย';
   
   return (
     <motion.div 
@@ -35,13 +72,23 @@ const UserCard: FC<UserCardProps> = ({ user }) => {
         <div className="px-4 pt-4 pb-10 relative z-10">
           <div className="flex items-center mb-3">
             <motion.div 
-              className="w-12 h-12 rounded-full bg-blue-500 overflow-hidden flex items-center justify-center text-white font-bold text-lg shadow-md border-2 border-white"
+              className={`w-12 h-12 rounded-full ${gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'} overflow-hidden flex items-center justify-center text-white font-bold text-lg shadow-md border-2 border-white`}
               whileHover={{ rotate: 5 }}
             >
               {user.firstName.charAt(0)}{user.lastName.charAt(0)}
             </motion.div>
             <div className="ml-3 text-gray-800">
-              <h3 className="font-bold text-lg leading-tight">{user.firstName} {user.lastName}</h3>
+              <h3 className="font-bold text-lg leading-tight flex items-center">
+                {user.firstName} {user.lastName}
+                <span className={`ml-2 ${genderColor}`}>
+                  <GenderIcon size={14} />
+                </span>
+                {age && (
+                  <span className="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 rounded-full">
+                    {age} ปี
+                  </span>
+                )}
+              </h3>
               <p className="text-xs text-blue-500 flex items-center mt-1">
                 <FaBriefcase className="mr-1" />
                 {user.company.title}
@@ -121,9 +168,26 @@ const UserCard: FC<UserCardProps> = ({ user }) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             <div className="p-4 space-y-3 text-sm divide-y divide-blue-100">
+              {/* ข้อมูลเพศ */}
+              <motion.div 
+                className="flex items-center pt-2 first:pt-0"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.05 }}
+                whileHover={{ backgroundColor: "rgba(239, 246, 255, 0.7)" }}
+              >
+                <div className={`w-6 ${genderColor}`}>
+                  <GenderIcon size={14} />
+                </div>
+                <div className="ml-2">
+                  <div className="text-xs text-blue-500 mb-0.5">เพศ</div>
+                  <div className="text-gray-700">{genderText}</div>
+                </div>
+              </motion.div>
+              
               {user.phone && (
                 <motion.div 
-                  className="flex items-center pt-2 first:pt-0"
+                  className="flex items-center pt-2"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
@@ -175,7 +239,7 @@ const UserCard: FC<UserCardProps> = ({ user }) => {
                     <FaBirthdayCake size={14} />
                   </div>
                   <div className="ml-2">
-                    <div className="text-xs text-blue-500 mb-0.5">Birth Date</div>
+                    <div className="text-xs text-blue-500 mb-0.5">Birth Date {age && `(อายุ ${age} ปี)`}</div>
                     <div className="text-gray-700">{user.birthDate}</div>
                   </div>
                 </motion.div>

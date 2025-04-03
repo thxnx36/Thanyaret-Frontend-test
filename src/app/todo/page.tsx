@@ -33,50 +33,58 @@ export default function TodoPage() {
       return;
     }
     
+    const itemCopy = { ...item };
+    
     setMainList(prev => prev.filter(i => i.id !== itemId));
     
     if (item.type === 'Fruit') {
       itemStatesRef.current[itemId] = 'fruit';
       
-      setFruitItems(prev => [...prev, item]);
-      
-      if (timeoutIdsRef.current[itemId]) {
-        clearTimeout(timeoutIdsRef.current[itemId]);
-      }
-      
-      const timeoutId = setTimeout(() => {
-        if (itemStatesRef.current[itemId] === 'fruit') {
-          setFruitItems(prev => prev.filter(i => i.id !== itemId));
-          setMainList(prev => [...prev, item]);
-          
-          itemStatesRef.current[itemId] = 'main';
-          
-          delete timeoutIdsRef.current[itemId];
+      setTimeout(() => {
+        setFruitItems(prev => [...prev, itemCopy]);
+        
+        if (timeoutIdsRef.current[itemId]) {
+          clearTimeout(timeoutIdsRef.current[itemId]);
         }
-      }, 5000);
-      
-      timeoutIdsRef.current[itemId] = timeoutId;
+        
+        const timeoutId = setTimeout(() => {
+          if (itemStatesRef.current[itemId] === 'fruit') {
+            setFruitItems(prev => prev.filter(i => i.id !== itemId));
+            
+            setTimeout(() => {
+              itemStatesRef.current[itemId] = 'main';
+              setMainList(prev => [...prev, itemCopy]);
+              delete timeoutIdsRef.current[itemId];
+            }, 50);
+          }
+        }, 5000);
+        
+        timeoutIdsRef.current[itemId] = timeoutId;
+      }, 50);
     } else if (item.type === 'Vegetable') {
       itemStatesRef.current[itemId] = 'vegetable';
       
-      setVegetableItems(prev => [...prev, item]);
-      
-      if (timeoutIdsRef.current[itemId]) {
-        clearTimeout(timeoutIdsRef.current[itemId]);
-      }
-      
-      const timeoutId = setTimeout(() => {
-        if (itemStatesRef.current[itemId] === 'vegetable') {
-          setVegetableItems(prev => prev.filter(i => i.id !== itemId));
-          setMainList(prev => [...prev, item]);
-          
-          itemStatesRef.current[itemId] = 'main';
-          
-          delete timeoutIdsRef.current[itemId];
+      setTimeout(() => {
+        setVegetableItems(prev => [...prev, itemCopy]);
+        
+        if (timeoutIdsRef.current[itemId]) {
+          clearTimeout(timeoutIdsRef.current[itemId]);
         }
-      }, 5000);
-      
-      timeoutIdsRef.current[itemId] = timeoutId;
+        
+        const timeoutId = setTimeout(() => {
+          if (itemStatesRef.current[itemId] === 'vegetable') {
+            setVegetableItems(prev => prev.filter(i => i.id !== itemId));
+            
+            setTimeout(() => {
+              itemStatesRef.current[itemId] = 'main';
+              setMainList(prev => [...prev, itemCopy]);
+              delete timeoutIdsRef.current[itemId];
+            }, 50);
+          }
+        }, 5000);
+        
+        timeoutIdsRef.current[itemId] = timeoutId;
+      }, 50);
     }
   };
   
@@ -94,11 +102,14 @@ export default function TodoPage() {
       delete timeoutIdsRef.current[itemId];
     }
     
-    itemStatesRef.current[itemId] = 'main';
+    const itemCopy = { ...item };
     
     setFruitItems(prev => prev.filter(i => i.id !== itemId));
     
-    setMainList(prev => [...prev, item]);
+    setTimeout(() => {
+      itemStatesRef.current[itemId] = 'main';
+      setMainList(prev => [...prev, itemCopy]);
+    }, 50);
   };
   
   const handleVegetableItemClick = (item: TodoItem) => {
@@ -115,11 +126,14 @@ export default function TodoPage() {
       delete timeoutIdsRef.current[itemId];
     }
     
-    itemStatesRef.current[itemId] = 'main';
+    const itemCopy = { ...item };
     
     setVegetableItems(prev => prev.filter(i => i.id !== itemId));
     
-    setMainList(prev => [...prev, item]);
+    setTimeout(() => {
+      itemStatesRef.current[itemId] = 'main';
+      setMainList(prev => [...prev, itemCopy]);
+    }, 50);
   };
 
   useEffect(() => {
